@@ -1,168 +1,77 @@
-document.addEventListener('DOMContentLoaded', function () {
-  if (document.querySelectorAll('#map').length > 0)
-  {
-    if (document.querySelector('html').lang)
-      lang = document.querySelector('html').lang;
-    else
-      lang = 'en';
-
-    var js_file = document.createElement('script');
-    js_file.type = 'text/javascript';
-    js_file.src = 'https://maps.googleapis.com/maps/api/js?callback=initMap&signed_in=true&language=' + lang;
-    document.getElementsByTagName('head')[0].appendChild(js_file);
-  }
-
-});
-
-var centerPoint = {lat: 52.507, lng: 13.405};
-
-var gridFollowers = [
-        {lat: 52.511, lng: 13.447},
-        {lat: 52.549, lng: 13.422},
-        {lat: 52.497, lng: 13.396},
-        {lat: 52.517, lng: 13.394}
-      ];
-
-var gridLeaders = [
-        {lat: 52.497, lng: 13.396}
-];
-
 
 var markers = [];
+var center;
+var bounds;
 var map;
-var noOfUsers;
-var gridPer;
 
-function initMap() {
-        var map = new google.maps.Map(document.getElementById('map'), {
-          center: centerPoint,
-          zoom: 13
+initAutocomplete();
+
+function initAutocomplete() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: -33.8688, lng: 151.2195},
+          zoom: 6,
+          mapTypeId: 'roadmap'
         });
 
+        // Create the search box and link it to the UI element.
         var input = document.getElementById('pac-input');
-
-        var autocomplete = new google.maps.places.Autocomplete(input);
-        autocomplete.bindTo('bounds', map);
-
+        var searchBox = new google.maps.places.SearchBox(input);
         map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
-        var infowindow = new google.maps.InfoWindow();
-        var infowindowContent = document.getElementById('infowindow-content');
-        infowindow.setContent(infowindowContent);
-        var marker = new google.maps.Marker({
-          map: map
-        });
-        marker.addListener('click', function() {
-          infowindow.open(map, marker);
+        // Bias the SearchBox results towards current map's viewport.
+        map.addListener('bounds_changed', function() {
+          searchBox.setBounds(map.getBounds());
         });
 
-        autocomplete.addListener('place_changed', function() {
-          infowindow.close();
-          var place = autocomplete.getPlace();
-          if (!place.geometry) {
+        
+        // Listen for the event fired when the user selects a prediction and retrieve
+        // more details for that place.
+        searchBox.addListener('places_changed', function() {
+          var places = searchBox.getPlaces();
+
+          if (places.length == 0) {
             return;
           }
 
-          if (place.geometry.viewport) {
-            map.fitBounds(place.geometry.viewport);
-          } else {
-            map.setCenter(place.geometry.location);
-            map.setZoom(17);
-          }
-
-          // Set the position of the marker using the place ID and location.
-          marker.setPlace({
-            placeId: place.place_id,
-            location: place.geometry.location
+          // Clear out the old markers.
+          markers.forEach(function(marker) {
+            marker.setMap(null);
           });
-          marker.setVisible(true);
+          markers = [];
 
-          infowindowContent.children['place-name'].textContent = place.name;
-          infowindowContent.children['place-id'].textContent = place.place_id;
-          infowindowContent.children['place-address'].textContent =
-              place.formatted_address;
-          infowindow.open(map, marker);
+          // For each place, get the icon, name and location.
+          bounds = new google.maps.LatLngBounds();
+          places.forEach(function(place) {
+            if (!place.geometry) {
+              console.log("Returned place contains no geometry");
+              return;
+            }
+            var icon = {
+              url: place.icon,
+              size: new google.maps.Size(71, 71),
+              origin: new google.maps.Point(0, 0),
+              anchor: new google.maps.Point(17, 34),
+              scaledSize: new google.maps.Size(25, 25)
+            };
+
+            // Create a marker for each place.
+            markers.push(new google.maps.Marker({
+              map: map,
+              icon: icon,
+              title: place.name,
+              position: place.geometry.location
+            }));
+
+            center = map.getCenter();
+            if (place.geometry.viewport) {
+              // Only geocodes have viewport.
+              bounds.union(place.geometry.viewport);
+            } else {
+              bounds.extend(place.geometry.location);
+            }
+          });
+          map.fitBounds(bounds);
         });
-      }
-
-function followers() {
-        var users = document.getElementById("noOfUsers");
-        window.alert(users);
-        noOfUsers = users.options[users.selectedIndex].value;
-
-        clearMarkers();
-        populateUsers(noOfUsers);
-        for (var i = 0; i < gridFollowers.length; i++) {
-          addMarkerForFollower(gridFollowers[i], i * 200);
-        }
-}
-
-function populateUsers(noOfUsers){
-    for (var i=0; i<noOfUsers; i++) {
-        gridFollowers.push();
-    }
-}
-
-function randomGeo(center, radius) {
-    var y0 = center.lat;
-    var x0 = center.lng;
-    var rd = radius / 111300; //about 111300 meters in one degree
-
-    var u = Math.random();
-    var v = Math.random();
-
-    var w = rd * Math.sqrt(u);
-    var t = 2 * Math.PI * v;
-    var x = w * Math.cos(t);
-    var y = w * Math.sin(t);
-
-    //Adjust the x-coordinate for the shrinking of the east-west distances
-    var xp = x / Math.cos(y0);
-
-    var newlat = y + y0;
-    var newlon = x + x0;
-    //var newlon2 = xp + x0;
-
-    return {
-        lat: newlat,
-        lng: newlon       
-    };
-}
-
-function leaders() {
-        //clearMarkers();
-        for (var i = 0; i < gridLeaders.length; i++) {
-          addMarkerForLeader(gridLeaders[i], i * 200);
-        }
-        var users = document.getElementById("noOfUsers");
-        noOfUsers = users.options[users.selectedIndex].value;
-        var gPercent = document.getElementById("gridPercentage");
-        gridPer = gPercent.options[gPercent.selectedIndex].value;
-        window.alert(JSON.stringify(randomGeo(map.center,10)));
-}
-
-function addMarkerForFollower(position, timeout) {
-        window.setTimeout(function() {
-
-          markers.push(new google.maps.Marker({
-            icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
-            position: position,
-            map: map,
-            animation: google.maps.Animation.DROP
-          }));
-        }, timeout);
-      }
-
-function addMarkerForLeader(position, timeout) {
-        window.setTimeout(function() {
-
-          markers.push(new google.maps.Marker({
-            icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
-            position: position,
-            map: map,
-            animation: google.maps.Animation.DROP
-          }));
-        }, timeout);
       }
 
 function clearMarkers() {
@@ -172,3 +81,100 @@ function clearMarkers() {
         markers = [];
       }
 
+
+function createMarker(map, point, content) {
+  var marker = new google.maps.Marker({
+    position: point,
+    map: map
+  });
+  google.maps.event.addListener(marker, "click", function(evt) {
+    infowindow.setContent(content + "<br>" + marker.getPosition().toUrlValue(6));
+    infowindow.open(map, marker);
+  });
+  return marker;
+}
+function followers() {
+        clearMarkers();
+        var users = document.getElementById("noOfUsers");
+        var noOfUsers = users.options[users.selectedIndex].value;
+        
+        var sw = bounds.getSouthWest();
+        var ne = bounds.getNorthEast();
+        
+        //map.fitBounds(bounds)
+
+        //var markers = [];
+        for(var i = 0; i < noOfUsers; i++){
+              var ptLat = Math.random() * (ne.lat() - sw.lat()) + sw.lat();
+              var ptLng = Math.random() * (ne.lng() - sw.lng()) + sw.lng();
+              var point = new google.maps.LatLng(ptLat, ptLng);
+              //window.alert(point);
+              //addMarker(point, 2);
+              markers[i] = point;
+        }
+        
+        //var infowindow = new google.maps.InfoWindow;
+
+        for (var i = 0; i < markers.length; i++) { 
+            //window.alert(markers[i]); 
+            var marker = new google.maps.Marker({
+                 position: markers[i],
+                 map: map
+            });
+
+            marker.setMap(map);
+        }
+        //window.alert(markers.length);
+       
+}
+
+function getRandomArbitrary(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
+function leaders(){
+  var gridP = document.getElementById("gridPercentage");
+  var pOfLeaders = gridP.options[gridP.selectedIndex].value;
+  var users = document.getElementById("noOfUsers");
+  var noOfUsers = users.options[users.selectedIndex].value;
+
+  //window.alert(gridP+','+users)
+  var leaderCount = (pOfLeaders / 100) * noOfUsers;
+
+  for (var i = 0; i < leaderCount; i++){
+      var randNum = Math.ceil(getRandomArbitrary(0,noOfUsers-1));
+
+      //window.alert(randNum);
+
+      var marker = new google.maps.Marker({
+            icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+            position: markers[randNum],
+            map: map
+        });
+
+      marker.setMap(map);
+
+  }
+
+}
+
+
+function addMarker(position, timeout){
+  //window.alert(position);
+  var marker = new google.maps.Marker({
+          position: position,
+          map: map
+        });
+
+  window.alert(marker+'');
+
+  var infowindow = new google.maps.InfoWindow({
+          content: '<p>Marker Location:' + marker.getPosition() + '</p>'
+        });
+
+        google.maps.event.addListener(marker, 'click', function() {
+          infowindow.open(map, marker);
+        });
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);

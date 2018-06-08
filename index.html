@@ -32,12 +32,16 @@
       <button id="followers" onclick="followers()">Populate Users</button>
 
       <button id="leaders" onclick="leaders()">Populate Grid Leaders</button>
+
+      <button id="leaders">Simulate connection</button>
     </div>
 
 
     <input id="pac-input" class="controls" type="text"
         placeholder="Enter a location">
+
     <div id="map"></div>
+
     <div id="infowindow-content">
       <span id="place-name"  class="title"></span><br>
       Place ID <span id="place-id"></span><br>
@@ -45,8 +49,8 @@
     </div>
 
     <script src="script.js" defer></script>
-   <script src="https://maps.googleapis.com/maps/api/js?sensor=false&key=AIzaSyB1DkbCiVGpJPS9ZfQTa9rwgogMIgW_3cg&libraries=places&callback=initMap"
-        async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1DkbCiVGpJPS9ZfQTa9rwgogMIgW_3cg&libraries=places&callback=initAutocomplete"
+         async defer></script>
   </body>
 
 </html>
