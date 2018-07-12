@@ -490,7 +490,7 @@ function followers() {
 
 
 
-                icon: 'images/gridmarkerfollower.png',
+                icon: 'images/grid_follower.png',
 
 
 
@@ -1010,7 +1010,7 @@ function leaders(){
 
 
 
-            icon: 'images/gridmarkerleader.png',
+            icon: 'images/grid_leader.png',
 
 
 
