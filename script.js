@@ -51,23 +51,13 @@ function initAutocomplete() {
 
         });
 
-
-
-
-
-
-
         // Create the search box and link it to the UI element.
 
 
 
         var input = document.getElementById('pac-input');
 
-
-
         var searchBox = new google.maps.places.SearchBox(input);
-
-
 
         map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
@@ -92,48 +82,20 @@ function initAutocomplete() {
         });
 
 
-
-
-
-
-
-        
-
-
-
         // Listen for the event fired when the user selects a prediction and retrieve
-
-
 
         // more details for that place.
 
 
-
         searchBox.addListener('places_changed', function() {
-
-
 
           var places = searchBox.getPlaces();
 
-
-
-
-
-
-
           if (places.length == 0) {
-
-
 
             return;
 
-
-
           }
-
-
-
-
 
 
 
@@ -157,25 +119,14 @@ function initAutocomplete() {
 
 
 
-
-
-
-
           // For each place, get the icon, name and location.
-
 
 
           bounds = new google.maps.LatLngBounds();
 
-
-
           places.forEach(function(place) {
 
-
-
             if (!place.geometry) {
-
-
 
               console.log("Returned place contains no geometry");
 
@@ -594,56 +545,24 @@ function formGrid(){
 
 
         var nEast = east ;
-
-
-
-
-
-
-
         var nWest = west ;
-
-
-
-
-
-
-
         var rectangle = new google.maps.Rectangle({
-
-
 
             strokeColor: '#FF0000',
 
-
-
             strokeOpacity: 0.8,
-
-
 
             strokeWeight: 2,
 
-
-
             fillColor: '#FF0000',
-
-
 
             fillOpacity: 0.35,
 
-
-
             map: map,
-
-
 
             bounds: {
 
-
-
               north: nNorth,
-
-
 
               south: nSouth,
 
@@ -992,88 +911,94 @@ function leaders(){
             //animation: google.maps.Animation.DROP,
 
 
-
             map: map,
-
-
 
             title: 'Grid Leader'
 
-
-
         });
-
-
-
-        
-
-
 
       leaderMarkers.push(marker);
 
-
-
       marker.setMap(map);
-
-
-
-
-
-
 
   }
 
-
-
-
-
-
-
 }
-
-
-
-
-
-
 
 function clearMarkerPosition(nMarkers, nPositions){
 
-
-
   for (var i = 0; i < nMarkers.length; i++){
 
-
-
     nMarkers[i].setMap(null);
-
-
-
   }
 
-
-
   nMarkers = [];
-
-
-
   nPositions = [];
 
-
-
 }
-
-
-
-
-
-
 
 function infrastructure(){
 
   clearMarkerPosition(infrastructureMarkers, infrastructurePositions);
 
-  var center = new google.maps.Marker({
+var point = new google.maps.LatLng(bounds.getSouthWest().lat(), bounds.getNorthEast().lng())
+var length = haversineDistance(point,bounds.getNorthEast());
+window.alert(length)
+var point = new google.maps.LatLng(bounds.getNorthEast().lat(), bounds.getSouthWest().lng()) 
+var width = haversineDistance(point,bounds.getNorthEast());
+window.alert(width) 
+
+var area = length * width
+
+
+var noOfInfra = Math.ceil(area)
+window.alert(noOfInfra)
+
+var sw = bounds.getSouthWest();
+
+var ne = bounds.getNorthEast();
+
+for(var i = 0; i < noOfInfra; i++){
+
+
+              var ptLat = Math.random() * (ne.lat() - sw.lat()) + sw.lat();
+
+              var ptLng = Math.random() * (ne.lng() - sw.lng()) + sw.lng();
+
+              var point = new google.maps.LatLng(ptLat, ptLng);
+
+              infrastructurePositions.push(point);
+
+              //window.alert(point);
+
+              //addMarker(point, 2);
+
+              var marker = new google.maps.Marker({
+
+                icon: 'images/basestation.png',
+
+                position: point,
+
+                animation: google.maps.Animation.DROP,
+
+                map: map,
+
+                title: 'Base station'
+
+              });
+            }
+
+window.alert(area)
+        
+
+
+
+
+
+
+
+
+ /* var center = new google.maps.Marker({
                 icon: 'images/basestation.png',
                 position: map.getCenter(),
                 animation: google.maps.Animation.DROP,
@@ -1145,79 +1070,32 @@ function infrastructure(){
                 animation: google.maps.Animation.DROP,
                 map: map,
                 title: 'Base station'
-                });
+                });*/
 
 }
 
-
-
-
-
-
-
-
-
-
-
 function addMarker(position, timeout){
-
-
-
   //window.alert(position);
-
-
 
   var marker = new google.maps.Marker({
 
-
-
           position: position,
-
-
 
           map: map
 
-
-
         });
-
-
-
-
-
-
 
   window.alert(marker+'');
 
-
-
-
-
-
-
   var infowindow = new google.maps.InfoWindow({
-
-
 
           content: '<p>Marker Location:' + marker.getPosition() + '</p>'
 
-
-
         });
-
-
-
-
-
-
 
         google.maps.event.addListener(marker, 'click', function() {
 
-
-
           infowindow.open(map, marker);
-
-
 
         });
 
