@@ -943,20 +943,149 @@ function infrastructure(){
 
 var point = new google.maps.LatLng(bounds.getSouthWest().lat(), bounds.getNorthEast().lng())
 var length = haversineDistance(point,bounds.getNorthEast());
-window.alert(length)
+//window.alert(length)
 var point = new google.maps.LatLng(bounds.getNorthEast().lat(), bounds.getSouthWest().lng()) 
 var width = haversineDistance(point,bounds.getNorthEast());
-window.alert(width) 
+//window.alert(width) 
 
 var area = length * width
 
 
-var noOfInfra = Math.ceil(area)
-window.alert(noOfInfra)
+var noOfInfra =  Math.ceil(area)
+//window.alert(area)
+//window.alert(noOfInfra)
+
+var infraRange = area / noOfInfra
 
 var sw = bounds.getSouthWest();
 
 var ne = bounds.getNorthEast();
+
+if (noOfInfra == 1){
+  var center = new google.maps.Marker({
+                icon: 'images/basestation.png',
+                position: map.getCenter(),
+                animation: google.maps.Animation.DROP,
+                map: map,
+                title: 'Base station'
+                });
+
+} else if (noOfInfra == 2){
+  var point = new google.maps.LatLng(map.getCenter().lat(), bounds.getSouthWest().lng())
+  var CentL = new google.maps.Marker({
+                icon: 'images/basestation.png',
+                position: point,
+                animation: google.maps.Animation.DROP,
+                map: map,
+                title: 'Base station'
+                });
+  var point = new google.maps.LatLng(map.getCenter().lat(), bounds.getNorthEast().lng())
+  var CentR = new google.maps.Marker({
+                icon: 'images/basestation.png',
+                position: point,
+                animation: google.maps.Animation.DROP,
+                map: map,
+                title: 'Base station'
+                });
+
+} else if (noOfInfra == 3){
+  var center = new google.maps.Marker({
+                icon: 'images/basestation.png',
+                position: map.getCenter(),
+                animation: google.maps.Animation.DROP,
+                map: map,
+                title: 'Base station'
+                });
+  var point = new google.maps.LatLng(map.getCenter().lat(), bounds.getSouthWest().lng())
+  var CentL = new google.maps.Marker({
+                icon: 'images/basestation.png',
+                position: point,
+                animation: google.maps.Animation.DROP,
+                map: map,
+                title: 'Base station'
+                });
+  var point = new google.maps.LatLng(map.getCenter().lat(), bounds.getNorthEast().lng())
+  var CentR = new google.maps.Marker({
+                icon: 'images/basestation.png',
+                position: point,
+                animation: google.maps.Animation.DROP,
+                map: map,
+                title: 'Base station'
+                });
+} else if (noOfInfra == 4){
+  var topR = new google.maps.Marker({
+                icon: 'images/basestation.png',
+                position: bounds.getNorthEast(),
+                animation: google.maps.Animation.DROP,
+                map: map,
+                title: 'Base station'
+                });
+   var botL = new google.maps.Marker({
+                icon: 'images/basestation.png',
+                position: bounds.getSouthWest(),
+                animation: google.maps.Animation.DROP,
+                map: map,
+                title: 'Base station'
+                });
+var point = new google.maps.LatLng(bounds.getSouthWest().lat(), bounds.getNorthEast().lng())
+
+    var botR = new google.maps.Marker({
+                icon: 'images/basestation.png',
+                position: point,
+                animation: google.maps.Animation.DROP,
+                map: map,
+                title: 'Base station'
+                });
+    var point = new google.maps.LatLng(bounds.getNorthEast().lat(), bounds.getSouthWest().lng())
+      var topL = new google.maps.Marker({
+                icon: 'images/basestation.png',
+                position: point,
+                animation: google.maps.Animation.DROP,
+                map: map,
+                title: 'Base station'
+                });
+} else if (noOfInfra == 5){
+  var center = new google.maps.Marker({
+                icon: 'images/basestation.png',
+                position: map.getCenter(),
+                animation: google.maps.Animation.DROP,
+                map: map,
+                title: 'Base station'
+                });
+  var topR = new google.maps.Marker({
+                icon: 'images/basestation.png',
+                position: bounds.getNorthEast(),
+                animation: google.maps.Animation.DROP,
+                map: map,
+                title: 'Base station'
+                });
+   var botL = new google.maps.Marker({
+                icon: 'images/basestation.png',
+                position: bounds.getSouthWest(),
+                animation: google.maps.Animation.DROP,
+                map: map,
+                title: 'Base station'
+                });
+var point = new google.maps.LatLng(bounds.getSouthWest().lat(), bounds.getNorthEast().lng())
+
+    var botR = new google.maps.Marker({
+                icon: 'images/basestation.png',
+                position: point,
+                animation: google.maps.Animation.DROP,
+                map: map,
+                title: 'Base station'
+                });
+    var point = new google.maps.LatLng(bounds.getNorthEast().lat(), bounds.getSouthWest().lng())
+      var topL = new google.maps.Marker({
+                icon: 'images/basestation.png',
+                position: point,
+                animation: google.maps.Animation.DROP,
+                map: map,
+                title: 'Base station'
+                });
+}
+
+else { 
 
 for(var i = 0; i < noOfInfra; i++){
 
@@ -988,8 +1117,7 @@ for(var i = 0; i < noOfInfra; i++){
               });
             }
 
-window.alert(area)
-        
+        } 
 
 
 
